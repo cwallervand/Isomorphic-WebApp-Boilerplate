@@ -1,7 +1,7 @@
 {
   "name": "Isomorphic-WebApp-Boilerplate",
   "version": "1.0.0",
-  "description": "Boilerplate for a web application running on Node with Express, React, Gulp and Sass",
+  "description": "Boilerplate for a web application running on Node with Express, React, Gulp, Sass and Jasmine",
   "main": "server.js",
   "scripts": {
     "test": "test",
@@ -17,12 +17,23 @@
     "Gulp",
     "Express",
     "Node",
-    "Sass"
+    "Sass",
+    "Jasmine"
   ],
   "author": "Christian Wallervand",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/cwallervand/Isomorphic-WebApp-Boilerplate/issues"
   },
-  "homepage": "https://github.com/cwallervand/Isomorphic-WebApp-Boilerplate"
+  "homepage": "https://github.com/cwallervand/Isomorphic-WebApp-Boilerplate",
+  "dependencies": {
+
+  },
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-express": "^0.3.5"
+    "gulp-jasmine": "^2.0.1",
+    "gulp-rename": "^1.2.2",
+    "run-sequence": "^1.0.2"
+  }
 }
