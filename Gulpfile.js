@@ -1,3 +1,4 @@
+//  Dependencies
 var gulp = require('gulp'),
     server = require('gulp-express'), //Plugin for Express app-server
     babel = require("gulp-babel"), //For converting ES6 to ES5;
@@ -5,15 +6,34 @@ var gulp = require('gulp'),
     jasmine = require('gulp-jasmine'), //Testing with Jasmine
     runSequence = require('run-sequence');
 
-
+// Paths configuration
 var paths = {
   src: {
-    js: 'src',
-    server: 'server.js'
+    path: 'src',
+    js: {
+      path: 'src/js'
+    },
+    style: {
+      path: 'src/style'
+    },
+    server: {
+      path: 'server.js'
+    },
+    views: {
+      path: 'src/views'
+    }
   },
   dest: {
     path: 'dest',
-    server: 'serverES5.js'
+    js: {
+      path: 'dest/js'
+    },
+    style: {
+      path: 'dest/style'
+    },
+    server: {
+      path: 'serverES5.js'
+    }
   }
 };
 
@@ -23,17 +43,17 @@ var paths = {
 **/
 gulp.task('run_tests', function() {
   console.log('### RUNNING TESTS ###');
-  return gulp.src(paths.dest.path + '/**/__test__/*.js')
+  return gulp.src(paths.dest.js.path + '/**/__test__/*.js')
     .pipe(jasmine());
 });
 
-//Starts the server
+//  Starts the server in dev mode
 gulp.task('server_dev', function() {
-  console.log('### STARTING SERVER ###');
-  return server.run([paths.dest.server]);
+  console.log('### STARTING SERVER IN DEV MODE ###');
+  return server.run([paths.dest.server.path]);
 });
 
-//Starts the server with 'production' as Node environment
+//  Starts the server in production mode
 gulp.task('server_prod', function() {
   console.log('### STARTING SERVER ###');
   var options = {
@@ -42,7 +62,7 @@ gulp.task('server_prod', function() {
   options.env = process.env;
   options.env.NODE_ENV = 'production';
 
-  return server.run([paths.dest.server], options);
+  return server.run([paths.dest.server.path], options);
 });
 
 /**
@@ -51,29 +71,32 @@ gulp.task('server_prod', function() {
 **/
 gulp.task('es5ifyServerJS', function() {
   console.log ('### ES5IFY SERVER.JS ###');
-  return gulp.src(paths.src.server)
+  return gulp.src(paths.src.server.path)
     .pipe(babel())
-    .pipe(rename(paths.dest.server))
+    .pipe(rename(paths.dest.server.path))
     .pipe(gulp.dest('.'));
 });
 
 
 /**
-  Creates ES6 to ES5 transpiled copies of js files in /app
-  and puts the copies in /dest, keeping the same structure
+  Creates ES6 to ES5 transpiled copies of js files in /src
+  and puts the copies in /dest/js, keeping the same structure
 **/
 gulp.task('es5ifySrc', function() {
   console.log ('### ES5IFY SCRIPTS IN /SRC ###');
-  return gulp.src([paths.src.js+'/**/*.js'])
+  return gulp.src([paths.src.js.path+'/**/*.js'])
     .pipe(babel())
-    .pipe(gulp.dest(paths.dest.path));
+    .pipe(gulp.dest(paths.dest.js.path));
 });
 
 gulp.task('copy_non_js_files', function() {
-  return gulp.src(['!'+paths.src.js+'/**/*.js', paths.src.js+'/**/*.*'])
+  return gulp.src(['!'+paths.src.js.path+'/**/*.js', paths.src.js.path+'/**/*.*'])
     .pipe(gulp.dest(paths.dest.path));
 });
 
+/**
+  Runs the es5ify* jobs
+**/
 gulp.task('build_js', function(callback) {
   runSequence('es5ifySrc', 'es5ifyServerJS', callback);
 });
@@ -94,7 +117,7 @@ gulp.task('run_prod', function(callback) {
   runSequence('build', 'server_prod', callback);
 });
 
-//Wathces changes on files and executes task when changes are detected
+//  Wathces changes on files and executes task when changes are detected
 gulp.task('watch', function(callback) {
   console.log('### WATCHING ###');
   gulp.watch([paths.src.server, paths.src.js + '/**/*.js'], ['run_dev']);
@@ -102,12 +125,12 @@ gulp.task('watch', function(callback) {
 
 gulp.task('watch_tests', function(callback) {
   console.log('### WATCHING TESTS ###');
-  gulp.watch([paths.src.js + '/**/*.js'], ['build_and_test']);
+  gulp.watch([paths.src.js.path + '/**/*.js'], ['build_and_test']);
 });
 
-gulp.task('test', function(callback) {
-  runSequence('build_and_test', 'watch_tests', callback);
-});
+// gulp.task('test', function(callback) {
+//   runSequence('build_and_test', 'watch_tests', callback);
+// });
 
 gulp.task('keep_alive', function(callback) {
 });
