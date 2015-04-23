@@ -4,6 +4,7 @@ var gulp = require('gulp'),
     babel = require("gulp-babel"), //For converting ES6 to ES5;
     rename = require('gulp-rename'), //Renaming of files,
     jasmine = require('gulp-jasmine'), //Testing with Jasmine
+    sass = require('gulp-sass'), //For building CSS from Sass
     runSequence = require('run-sequence');
 
 // Paths configuration
@@ -28,11 +29,14 @@ var paths = {
     js: {
       path: 'dest/js'
     },
-    style: {
-      path: 'dest/style'
-    },
     server: {
       path: 'serverES5.js'
+    }
+  },
+  www: {
+    path: 'www',
+    css: {
+      path: 'www/css'
     }
   }
 };
@@ -89,10 +93,14 @@ gulp.task('es5ifySrc', function() {
     .pipe(gulp.dest(paths.dest.js.path));
 });
 
-gulp.task('copy_non_js_files', function() {
-  return gulp.src(['!'+paths.src.js.path+'/**/*.js', paths.src.js.path+'/**/*.*'])
-    .pipe(gulp.dest(paths.dest.path));
-});
+// gulp.task('copy_non_js_files', function() {
+//   return gulp.src(
+//     [
+//       '!'+paths.src.js.path+'/**/*.js',
+//       paths.src.views.path+'/**/*.*'
+//     ])
+//     .pipe(gulp.dest(paths.dest.path));
+// });
 
 /**
   Runs the es5ify* jobs
@@ -101,8 +109,16 @@ gulp.task('build_js', function(callback) {
   runSequence('es5ifySrc', 'es5ifyServerJS', callback);
 });
 
+gulp.task('build_css', function(callback) {
+  console.log ('### BUILD CSS ###');
+  gulp.src(paths.src.style.path+'/myApp.scss')
+    .pipe(sass())
+    .pipe(rename('app.css'))
+    .pipe(gulp.dest(paths.www.css.path));
+});
+
 gulp.task('build', function(callback) {
-  runSequence('build_js', 'copy_non_js_files', callback);
+  runSequence('build_js', 'build_css', callback);
 });
 
 gulp.task('build_and_test', function(callback) {
