@@ -26,14 +26,16 @@
     "url": "https://github.com/cwallervand/Isomorphic-WebApp-Boilerplate/issues"
   },
   "homepage": "https://github.com/cwallervand/Isomorphic-WebApp-Boilerplate",
-  "dependencies": {
-
-  },
   "devDependencies": {
     "gulp": "^3.8.11",
-    "gulp-express": "^0.3.5"
+    "gulp-babel": "^5.1.0",
+    "gulp-express": "^0.3.5",
     "gulp-jasmine": "^2.0.1",
     "gulp-rename": "^1.2.2",
     "run-sequence": "^1.0.2"
+  },
+  "dependencies": {
+    "express": "^4.12.3",
+    "react": "^0.13.2"
   }
 }
