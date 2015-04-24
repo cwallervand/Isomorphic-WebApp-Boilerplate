@@ -1,11 +1,4 @@
-let React = require('react')
-
-function getTodoState() {
-    return {
-      allTodos: TodoStore.getAll(),
-      areAllComplete: TodoStore.areAllComplete()
-    }
-}
+let React = require('react');
 
 let MyApp = React.createClass({
   render() {
@@ -17,4 +10,4 @@ let MyApp = React.createClass({
   }
 });
 
-module.exports = TodoApp;
+module.exports = MyApp;

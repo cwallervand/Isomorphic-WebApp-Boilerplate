@@ -1,5 +1,4 @@
 'use strict';
-// require("babel/polyfill");
 
 let Express = require('express');
 let app = Express();
@@ -13,7 +12,7 @@ app.set('views', './src/views')
 // Set view engine
 app.set('view engine', 'ejs');
 
-app.use("/dest", Express.static(__dirname + '/dest'));
+app.use("/www", Express.static(__dirname + '/www'));
 
 // Routing
 app.get('/', (req, res) => {
