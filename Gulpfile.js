@@ -17,8 +17,8 @@ var paths = {
     js: {
       path: 'src/js'
     },
-    style: {
-      path: 'src/style'
+    scss: {
+      path: 'src/scss'
     },
     server: {
       path: 'server.js'
@@ -132,7 +132,7 @@ gulp.task('build_js', function(callback) {
 **/
 gulp.task('build_css', function(callback) {
   console.log ('### BUILD CSS ###');
-  return gulp.src(paths.src.style.path+'/myApp.scss')
+  return gulp.src(paths.src.scss.path+'/myApp.scss')
     .pipe(sass())
     .pipe(rename('app.css'))
     .pipe(gulp.dest(paths.www.css.path));
