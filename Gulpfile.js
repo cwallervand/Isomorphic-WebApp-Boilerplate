@@ -5,6 +5,9 @@ var gulp = require('gulp'),
     rename = require('gulp-rename'), //Renaming of files,
     jasmine = require('gulp-jasmine'), //Testing with Jasmine
     sass = require('gulp-sass'), //For building CSS from Sass
+    source = require('vinyl-source-stream'),
+    buffer = require('vinyl-buffer'),
+    browserify = require('browserify'), //Bundle JS
     runSequence = require('run-sequence');
 
 // Paths configuration
@@ -37,6 +40,9 @@ var paths = {
     path: 'www',
     css: {
       path: 'www/css'
+    },
+    js: {
+      path: 'www/js'
     }
   }
 };
@@ -81,7 +87,6 @@ gulp.task('es5ifyServerJS', function() {
     .pipe(gulp.dest('.'));
 });
 
-
 /**
   Creates ES6 to ES5 transpiled copies of js files in /src
   and puts the copies in /dest/js, keeping the same structure
@@ -91,6 +96,17 @@ gulp.task('es5ifySrc', function() {
   return gulp.src([paths.src.js.path+'/**/*.js'])
     .pipe(babel())
     .pipe(gulp.dest(paths.dest.js.path));
+});
+
+gulp.task('browserify', function() {
+  console.log('### BROWSERIFY ###');
+  browserify('./'+paths.dest.js.path+'/client.js', {debug: true})
+    //.ignore("babel/polyfill")
+    .bundle()
+    .pipe(source('app.js'))
+    .pipe(buffer())
+    //.pipe(uglify())
+    .pipe(gulp.dest(paths.www.js.path));
 });
 
 // gulp.task('copy_non_js_files', function() {
@@ -106,58 +122,74 @@ gulp.task('es5ifySrc', function() {
   Runs the es5ify* jobs
 **/
 gulp.task('build_js', function(callback) {
-  runSequence('es5ifySrc', 'es5ifyServerJS', callback);
+  console.log('### BUILD JS ###');
+  runSequence('es5ifySrc', 'es5ifyServerJS', 'browserify', callback);
 });
 
+/**
+  Builds the myApp Sass file to a single CSS file
+  and puts it in the www folder
+**/
 gulp.task('build_css', function(callback) {
   console.log ('### BUILD CSS ###');
-  gulp.src(paths.src.style.path+'/myApp.scss')
+  return gulp.src(paths.src.style.path+'/myApp.scss')
     .pipe(sass())
     .pipe(rename('app.css'))
     .pipe(gulp.dest(paths.www.css.path));
 });
 
+/**
+  Builds the application (JS, SCSS)
+**/
 gulp.task('build', function(callback) {
   runSequence('build_js', 'build_css', callback);
 });
 
+/**
+  Bulds the application and runs tests
+**/
 gulp.task('build_and_test', function(callback) {
   runSequence('build', 'run_tests', callback);
 });
 
+/**
+  Runs the application in dev mode
+**/
 gulp.task('run_dev', function(callback) {
   runSequence('build', 'run_tests', 'server_dev', callback);
 });
 
-gulp.task('run_prod', function(callback) {
-  runSequence('build', 'server_prod', callback);
-});
+// gulp.task('run_prod', function(callback) {
+//   runSequence('build', 'server_prod', callback);
+// });
 
 //  Wathces changes on files and executes task when changes are detected
 gulp.task('watch', function(callback) {
   console.log('### WATCHING ###');
-  gulp.watch([paths.src.server, paths.src.js + '/**/*.js'], ['run_dev']);
+  gulp.watch([paths.src.server.path, paths.src.js.path + '/**/*.js'], ['run_dev']);
 });
 
-gulp.task('watch_tests', function(callback) {
-  console.log('### WATCHING TESTS ###');
-  gulp.watch([paths.src.js.path + '/**/*.js'], ['build_and_test']);
-});
+// gulp.task('watch_tests', function(callback) {
+//   console.log('### WATCHING TESTS ###');
+//   gulp.watch([paths.src.js.path + '/**/*.js'], ['build_and_test']);
+// });
 
 // gulp.task('test', function(callback) {
 //   runSequence('build_and_test', 'watch_tests', callback);
 // });
 
-gulp.task('keep_alive', function(callback) {
+// gulp.task('keep_alive', function(callback) {
+// });
+
+gulp.task('dev', function(callback) {
+  runSequence('run_dev', 'watch', callback);
 });
 
 //Default task. Run when gulp command is used
 gulp.task('default', function(callback) {
- runSequence('run_dev', 'watch', callback);
+ runSequence('dev', callback);
 });
-gulp.task('dev', function(callback) {
-  runSequence('run_dev', 'watch', callback);
-});
-gulp.task('prod', function(callback) {
-  runSequence('run_prod', 'keep_alive', callback);
-});
+
+// gulp.task('prod', function(callback) {
+//   runSequence('run_prod', 'keep_alive', callback);
+// });
